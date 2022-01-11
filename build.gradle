@@ -53,7 +53,7 @@ dependencies {
     implementation('io.confluent:kafka-schema-registry-client:5.5.1') {
         exclude group: 'org.apache.kafka', module:'kafka-clients'
     }
-    implementation('org.apache.kafka:kafka_2.12:2.5.1') {
+    implementation('org.apache.kafka:kafka_2.12:2.8.1') {
         // contains kafka.utils.VerifiableProperties used by kafka-schema-registry-client, explicitly exclude
         // transitive dependencies
         transitive = false
@@ -63,12 +63,13 @@ dependencies {
     implementation 'org.glassfish.jersey.core:jersey-common:2.33'
     // given https://docs.confluent.io/current/installation/versions-interoperability.html matrix
     // Confluent Platform 5.5.x is Apache Kafka 2.5.x
-    implementation 'org.apache.kafka:kafka-clients:2.5.1'
-    implementation 'com.github.luben:zstd-jni:1.4.4-7'
+    implementation 'org.apache.kafka:kafka-clients:2.8.1'
+    implementation 'com.github.luben:zstd-jni:1.5.0-2'
     implementation 'org.slf4j:slf4j-api:1.7.30'
     implementation 'org.lz4:lz4-java:1.7.1'
-    implementation 'org.xerial.snappy:snappy-java:1.1.7.3'
+    implementation 'org.xerial.snappy:snappy-java:1.1.8.1'
 }
+
 task generateGemJarRequiresFile {
     doLast {
         File jars_file = file('lib/logstash-integration-kafka_jars.rb')
@@ -86,6 +87,7 @@ task vendor {
     doLast {
         String vendorPathPrefix = "vendor/jar-dependencies"
         configurations.runtimeClasspath.allDependencies.each { dep ->
+            println "Processing dependency: " + dep
             File f = configurations.runtimeClasspath.filter { it.absolutePath.contains("${dep.group}/${dep.name}/${dep.version}") }.singleFile
             String groupPath = dep.group.replaceAll('\\.', '/')
             File newJarFile = file("${vendorPathPrefix}/${groupPath}/${dep.name}/${dep.version}/${dep.name}-${dep.version}.jar")
